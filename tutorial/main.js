@@ -1,9 +1,16 @@
-const express = require('express')
+const express = require('express');
+const app = express();
 const fs = require('fs');
+const path = require('path');
+const qs = require('querystring');
+const sanitizeHtml = require('sanitize-html');
 const template = require('./lib/template');
-const app = express()
-const port = 3000
+const bodyParser = require('body-parser');
+const port = 3000;
 
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// 1. 홈 페이지
 // app.get('/', (req, res) => {  res.send('Hello World!')})
 app.get('/', function(request, response){
   fs.readdir('./data', function(err, filelist){
@@ -18,10 +25,114 @@ app.get('/', function(request, response){
   });
 });
 
-app.get('/page', function(req, res){
-  return res.send('/page')
+// 2. pageId 링크 클릭 시 페이지
+app.get('/page/:pageId', function(request, response){
+  fs.readdir('./data', function(err, filelist){
+    var filteredId = path.parse(request.params.pageId).base;
+    fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
+      var title = request.params.pageId;
+      var sanitizedTitle = sanitizeHtml(title);
+      var sanitizedDescription = sanitizeHtml(description);
+      var list = template.list(filelist);
+      var html = template.html(sanitizedTitle, list,
+        `<a href="/create">create</a>
+        <a href="/update/${sanitizedTitle}">update</a>
+        <form action="/delete_process" method="post">
+          <input type="hidden" name="id" value="${sanitizedTitle}">
+          <input type="submit" value="delete">
+        </form>
+        `,
+        `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`);
+      response.send(html);
+    });
+  });
 });
 
+//3. Create 버튼 클릭 시 페이지
+app.get('/create', function(request, response){
+  fs.readdir('./data', function(err, filelist){
+    var title = 'WEB - create';
+    var list = template.list(filelist);
+    var html = template.html(title, list,
+      '',
+      `
+      <form action="/create" method="post">
+        <p><input type="text" name="title"
+          placeholder="title">
+        </p>
+        <p>
+          <textarea name="description"
+          placeholder="description"></textarea>
+        </p>
+        <p><input type="submit"></p>
+      </form>
+    `);
+    response.send(html);
+  });
+});
+
+//4. create>제출 버튼 클릭 시 페이지
+app.post('/create', function(request, response){
+  var post = request.body;
+  var title = post.title;
+  var description = post.description;
+  fs.writeFile(`data/${title}`, description, 'utf8',
+  function(err) {
+    response.redirect(`/page/${title}`);
+  });
+});
+
+//5. update 버튼 클릭 시 페이지
+app.get('/update/:pageId', function(request, response){
+  fs.readdir('./data', function(err, filelist){
+    var filteredId = path.parse(request.params.pageId).base;
+    fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
+      var title = request.params.pageId;
+      var list = template.list(filelist);
+      var html = template.html(title, list,
+        //form 부분
+        `
+        <form action="/update" method="post">
+          <input type="hidden" name="id" value=${title}>
+          <p><input type="text" name="title"
+            placeholder="title" value="${title}">
+          </p>
+          <p>
+            <textarea name="description"
+            placeholder="description">${description}</textarea>
+          </p>
+          <p><input type="submit"></p>
+        </form>
+        `,
+        ``);
+      response.send(html);
+    });
+  });
+});
+
+//6. update>제출 버튼 클릭 시 페이지
+app.post('/update', function(request, response){
+  var post=  request.body;
+  var id = post.id;
+  var title = post.title;
+  var description = post.description;
+  fs.rename(`data/${id}`, `data/${title}`, function(err){
+    fs.writeFile(`data/${title}`, description, 'utf8',
+    function(err) {
+      response.redirect(`/page/${title}`);
+    });
+  });
+})
+
+//7. delete 버튼 클릭 시 페이지
+app.post('/delete_process', function(request, response){
+ var post = request.body;
+  var id = post.id;
+  var filteredId = path.parse(id).base;
+  fs.unlink(`data/${filteredId}`, function(error){
+    response.redirect('/');
+  });
+})
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 /*
 var http = require('http');
