@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>온라인 메모장</title>
+		<script src="//code.jquery.com/jquery.min.js"></script>
+		<link rel='stylesheet' href="/stylesheets/style.css" />
+		<script>
+            // 전역변수로 사용할 함수를 담기 위해 선언한 것들
+			var load = null;
+			var write = null;
+			var modify = null;
+            var del = null;
+            
+            //페이지가 모두 로딩된 후 작업을 처리하는 부분
+			$(document).ready(function () {
+                //load(): 데이터를 서버에게 요청하여 데이터를 받아 처리하는 함수
+				load = function () {
+                    //$.get() : load API를 받아옴. (data: 서버가 반환한 데이터)
+                    //load() : 메모 데이터를 요청함
+					$.get('/load', function (data){ 
+						$("#memo").empty(); //새 내용을 갱신하기 위해 memo를 비움
+						
+						$(data).each(function (i){  // 포문을 돌면서 각 메모를 출력
+							var id = this._id;
+							$("#memo").prepend("<div class='item'></div>");
+							$("#memo .item:first").append("<div class='photo_thumb'></div>");
+							$("#memo .item:first").append("<div class='author'><b>" + this.author + "</b> (" + this.date + ")&nbsp;&nbsp; <span class='text_button modify'>MODIFY</span> <span class='text_button del'>DELETE</span></div>");
+							$("#memo .item:first").append("<div class='contents " + id + "'>" + this.contents + "</div>");
+							
+							var cnt = 0;
+
+                            //modify 버튼을 눌렀을 때
+							$("#memo .item:first .modify").click(function(evt) { 
+								var contents = $("#memo ." + id).html();
+								if(cnt==0){
+									$("#memo ." + id).html("<textarea id='textarea_" + id + "' class='textarea_modify'>" + contents + "</textarea>");
+									cnt = 1;
+								}
+								$("#textarea_" + id).keypress(function(evt){  
+									if((evt.keyCode || evt.which) == 13){  // 키보드에서 엔터버튼이 눌러졌을 때
+									   if(this.value != "") {
+										modify(this.value, id);
+										evt.preventDefault();
+									   }
+									}
+								});
+							});
+                            
+                            // del 버튼이 눌러졌을 때
+							$("#memo .item:first .del").click(function(evt) { 
+								del(id);
+							});
+						});
+					});
+				};
+                
+                //수정
+				modify= function (contents, id){
+					var postdata = {
+						'author': $("#author").val(),
+						'contents': contents,
+						'_id': id
+					};
+					$.post('/modify', postdata, function() {
+						load();
+					});
+				};
+                
+                //쓰기
+				write = function(contents) {
+					var postdata = {
+						'author': $("#author").val(),
+						'contents': contents
+					};
+					$.post('/write', postdata, function() {
+						load();
+					});
+				};
+                
+                //삭제
+				del = function (id) {
+					console.log(id);
+					var postdata = {
+						'_id' : id
+					};
+					
+					$.post('/del', postdata, function() {
+						load();
+					});
+				};
+                
+                // 쓰기 영역에서 엔터 버튼을 눌렀을 때
+				$("#write textarea").keypress(function(evt){
+					if((evt.keyCode || evt.which) == 13){  
+						if(this.value!= "") {
+							write(this.value);
+							evt.preventDefault();
+							$(this).val("");
+						}
+					}
+				});
+                
+                // 쓰기 버튼을 클릭했을 때
+				$("#write_button").click(function(evt){  
+					console.log($("#write textarea").val());
+					write($("#write textarea").val());
+					$("#write textarea").val("");
+				});
+				
+				load();
+			});
+		</script>
+	</head>
+	<body>
+		<div id='main'>
+			<div id='title'>온라인 메모장 예제</div>
+			<div id='write'>
+				<div class='left'>
+					<input id='author' class='author' type='text' placeholder='메모 제목' />
+				</div>
+				<div class='right'>
+					<textarea placeholder='내용을 입력하세요'></textarea>
+					<br />
+					<input id='write_button' type='button' value='쓰기' />
+				</div>
+			</div>
+			<div id='memo'>
+				<div class='item'>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
