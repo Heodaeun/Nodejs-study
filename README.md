@@ -3,7 +3,11 @@
 node.js / express / pug / socket.io / mongoDB
 
 
-bingo - node.js express 이용한 빙고 
+
+
+
+
+bingo - node.js express 이용한 빙고 게임 만들기
 
 socket - 클라이언트-서버 socket 전송
 
