@@ -14,7 +14,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
         <script>
-            var socket = io.connect('http://localhost:3000'); //connect to server
+            var socket = io.connect('http://localhost:4000'); //connect to server
 
             var ctx = document.getElementById('myChart').getContext('2d');
             var chart = new Chart(ctx, {
@@ -48,6 +48,7 @@
                 if(chart.data.labels.length != 15) { //If we have less than 15 data points in the graph
                     chart.data.labels.push(data.time);  //Add time in x-asix
                     chart.data.datasets.forEach((dataset) => {
+                        console.log(dataset);
                         dataset.data.push(data.temp); //Add temp in y-axis
                     });
                 }
