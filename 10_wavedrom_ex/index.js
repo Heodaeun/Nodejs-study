@@ -14,7 +14,7 @@ var server = app.listen(4000, () => { //Start the server, listening on port 4000
 var io = require('socket.io')(server); //Bind socket.io to our express server.
 app.use(express.static('public')); //Send index.html page on GET /
 
-io.on('connection', (socket) => {
+io.once('connection', (socket) => {
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
 
     rl.on('line', function(line){
@@ -58,8 +58,6 @@ io.on('connection', (socket) => {
 
         io.emit('send_WaveDrom', drom);
 
-        // io.emit('send_WaveDrom');
-
         // wave += line;
         // console.log('wave: ', wave + socket.id);
         // input = line.split(' ');
@@ -68,10 +66,7 @@ io.on('connection', (socket) => {
         // line = '';
     });
 
-    
     socket.on('disconnect', () => {
         console.log('user disconnected');
     })
-
-
 });
