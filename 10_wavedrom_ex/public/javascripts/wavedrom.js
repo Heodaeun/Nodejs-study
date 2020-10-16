@@ -1,3 +1,42 @@
+console.log('hi');
+
+var wavedrom = {
+    waveJSON: null,
+    socket: null,
+
+    init: function(socket){
+        socket = io();
+
+        socket.on('connect', function() {
+            console.log('connected');
+        });
+
+
+        socket.on('send_WaveDrom', function(WaveJSON){
+            $('#page').text(WaveJSON.signal[0].wave);
+
+            this.waveJSON = WaveJSON;
+
+
+            console.log("this : ", this.waveJSON);
+            document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + this.waveJSON + "</script>";
+            document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"a", wave :"1...."}]}</script>';
+            console.log(document.body.innerHTML);
+            
+        });
+    },
+
+    // waveJSON을 클릭했을 때
+    clicked: function(){
+
+    }
+};
+
+$(document).ready(function () {
+    wavedrom.init();
+});
+
+
 // var page = document.getElementById('page');
 // page.innerText = "hi";
 
@@ -16,13 +55,6 @@
 // const fs = fs();
 
 
-console.log('hi');
-
-socket = io();
-
-socket.on('send_WaveDrom', function(WaveJSON){
-    console.log(WaveJSON);
-});
 
 // var script = document.createElement("script");
 // script.innerText = {"signal":[{"name":"a","wave":"pb10"}]};

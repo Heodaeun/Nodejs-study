@@ -24,6 +24,8 @@ io.once('connection', (socket) => {
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
     console.log('WaveJSON: ', WaveJSON);
     io.emit('send_WaveDrom', WaveJSON);
+
+    
     
     // input wavedrom data
     rl.on('line', function(line){
