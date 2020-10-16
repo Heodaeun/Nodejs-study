@@ -54,6 +54,8 @@ function insert_wave(check){
             waveData = waveData.split(" ").join("");    //공백 제거
             check = 0 ? WaveJSON.signal[i].wave = waveData
                      : WaveJSON.signal[i].wave += waveData;
+        }else{
+            check = 0 ? null : WaveJSON.signal[i].wave += '.';
         }
     }
 }
