@@ -1,7 +1,3 @@
-// $("#wave").type = "WaveDrom";
-// $("#wave").text = drom;
-// console.log('drom:' ,drom);
-
 // var page = document.getElementById('page');
 // page.innerText = "hi";
 
@@ -21,9 +17,25 @@
 
 
 console.log('hi');
+
+socket = io();
+
+socket.on('send_WaveDrom', function(WaveJSON){
+    console.log(WaveJSON);
+});
+
+// var script = document.createElement("script");
+// script.innerText = {"signal":[{"name":"a","wave":"pb10"}]};
+// var head = document.getElementsByTagName('head')[0];
+// head.appendChild(script);
+
+
+// window.location.reload();
+
+
+
 // var drom = document.getElementById('drom');
 // drom.innerText = '{ signal : [{ name: "clk",  wave: "p......" }]}';
-
 
 
 

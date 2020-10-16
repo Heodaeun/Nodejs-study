@@ -9,30 +9,25 @@
     </head>
     <body onload="WaveDrom.ProcessAll()">
     <!--script type="WaveDrom"을 timing diagram으로 출력함-->
-        <h1 id="head">WaveDrom</h1>
         <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+        
+        
+        <h1 id="head">WaveDrom</h1>
         <p id="page"></p>
+        <script type="text/javascript" src="javascripts/drom.js"></script>
+        
+        <!-- <input type="button" id="hw" value="Hello world" /> -->
+        <!-- <script id="drom" type="WaveDrom">s</script> -->
 
-        <script type="text/javascript" src="drom.js"> </script>
-        <input type="button" id="hw" value="Hello world" />
-        <script id=drom type="WaveDrom">s</script>
-
-
-
-        <!-- <script id=wavedrom type="WaveDrom">
+        <script id=wavedrom type="WaveDrom">
             { signal : [
                 { name :"a", wave :"1...."}
             ]}
-        </script> -->
-
-        <script id="ex"></script>
-
-
+        </script>
         <script>
-            var s = {"signal":[{"name":"a","wave":"1.."}]}
+            var s = {"signal":[{"name":"a","wave":"pb"}]}
             // var s = { signal : [
             //     { name: "clk", wave: "p......" },
             //     { name: "bus", wave: "x.34.5x", data: "head body tail" },
@@ -52,56 +47,61 @@
             socket.on('connect', function() {
                 console.log('connected');
             });
-            
-            socket.on('send_WaveDrom', function(drom){
-                console.log('wavedrom: ', drom);
 
-                var ref = document.getElementsByTagName('script')[0],
-                    script = document.createElement('script');
-                script.setAttribute('type', "WaveDrom");
-                script.setAttribute('id', 'problem');
-                script.innerHTML = s;
-                ref.parentNode.insertBefore(script, ref);
+            // socket.on('send_WaveDrom', function(WaveJSON){
+            //     console.log('wavedrom: ', WaveJSON);
 
-                var scr = document.getElementById('problem');
-                // console.log('scr:', scr.toString());
-                // console.log(scr.text);
+            //     // var ref = document.getElementsByTagName('script')[0],
+            //     //     script = document.createElement('script');
+            //     // script.setAttribute('type', "WaveDrom");
+            //     // script.setAttribute('id', 'problem');
+            //     // script.innerHTML = s;
+            //     // ref.parentNode.insertBefore(script, ref);
 
-
-
+            //     // var scr = document.getElementById('problem');
+            //     // console.log('scr:', scr.toString());
+            //     // console.log(scr.text);
                 
-                $('#page').text(drom.signal[0].wave);
-
-                // var scr = document.getElementById('wavedrom');                
-                // scr.type = "WaveDrom";
-                // scr.innerText = drom;
-                // console.log(scr.innerText);
-                // $('#wavedrom').type("WaveDrom");
-                // $('#wavedrom').text(drom);
-
-                // var p = document.getElementById('p');
-                // p.innerText = drom.signal[0].wave;
-
-                // console.log('s :', s);
-                // console.log("ex: ", ex);
-                // s = drom;
-                // ex = drom;
-                // console.log('s :', s);
-                // console.log("ex: ", ex);
-
-                // var scr = document.getElementById('wavedrom');
-                // console.log(scr);
+            //     $('#page').text(WaveJSON.signal[0].wave);
                 
-                // ex.type = "WaveDrom";
-                // scr.innerText = drom;
+            //     var script = document.createElement("script");
+            //     script.innerText = WaveJSON;
+            //     var head = document.getElementsByTagName('head')[0];
+            //     head.appendChild(script);
 
+            //     // var scr = document.getElementById('wavedrom');                
+            //     // scr.type = "WaveDrom";
+            //     // scr.innerText = drom;
+            //     // console.log("WaveDrom: ", scr);
+            //     // console.log(scr.innerText);
+            //     // $('#wavedrom').type("WaveDrom");
+            //     // $('#wavedrom').text(drom);
 
-                $("#wavedrom").load(window.location.href + "#wavedrom");
-                // var ex = document.getElementById('ex');
-                // console.log('ex: ', ex);
-                // console.log("s: ", scr.toString());
-            });
+            //     // var p = document.getElementById('p');
+            //     // p.innerText = drom.signal[0].wave;
+
+            //     // console.log('s :', s);
+            //     // console.log("ex: ", ex);
+            //     // s = drom;
+            //     // ex = drom;
+            //     // console.log('s :', s);
+            //     // console.log("ex: ", ex);
+
+            //     // var scr = document.getElementById('wavedrom');
+            //     // console.log(scr);
+                
+            //     // ex.type = "WaveDrom";
+            //     // scr.innerText = drom;
+
+            //     $("#wavedrom").load(window.location.href + "#wavedrom");
+            //     // var ex = document.getElementById('ex');
+            //     // console.log('ex: ', ex);
+            //     // console.log("s: ", scr.toString());
+            // });
         </script>
+
+        <!-- <script id="ex"></script> -->
+        
     </body>
     <style>
         h1, h4 {
