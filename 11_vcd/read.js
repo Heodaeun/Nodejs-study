@@ -49,28 +49,47 @@ for (var line = 0; line < lines.length; line++) {
     }else if(this_line.slice(0,1) == '#' && old_num == -1){ //#처음num 인 경우, (array_없음)
         console.log(this_line)
         old_num = this_line.slice(1, -1);
-        num = this_num - old_num;
 
         check2 = true;
 
     }else if(check2 == true){
-        if(this_line.slice(0,1) == '#'){    //처음이 아닌 #number인 경우,
+        if(this_line.slice(0,1) == '#' || this_line == ''){    //처음이 아닌 #number인 경우,
 
             this_num = this_line.slice(1);  //this_num = #"number"
             num = this_num - old_num;
 
             console.log(array_)
-            console.log(this_line.slice(1))
-            
+            console.log(this_num)
 
-            for(k in array_){   //k = n번째
-                n = array_[k];  //n = 1 or null
-                if(n == null){
-                    WaveJSON.signal[k].wave += '.' * num;
-                }
+            for(k in array_){   //k = array_의 n번째
+                // console.log('k번쨰 : ',k)
+                n = array_[k];  //n = wavedata or null
+                // console.log('log: ', n);
+
+                // for(i in WaveJSON.signal){  //i : WaveJSON의 n번째
+                //     j = WaveJSON.signal[i]; //j : i번째 JSON data
+
+                    if(n == 0){  //n = empty item인 경우
+                        WaveJSON.signal[k].wave += '.';
+                    }
+                    // }else{  //n = wave data인 경우
+                    //     if(j.name == nameJSON[find_name]){
+                    //         WaveJSON.signal[i].wave += n;
+                    //     } 
+                    // }
+                // }
+
+                // n = array_[k];  //n = 1 or null
+                // if(n == null){
+                //     WaveJSON.signal[k].wave += '.' * num;
+                // }
             }
 
             array_ = new Array(WaveJSON.signal.length); // 모두 null [ <n empty items> ] (초기화)
+            for(i=0; i<WaveJSON.signal.length; i++){
+                array_[i] = 0;
+            }
+
 
         }else{  // wave값인 경우,
             // insert_wave(1);
@@ -79,12 +98,12 @@ for (var line = 0; line < lines.length; line++) {
            for(i in WaveJSON.signal){  //i : n번째
                j = WaveJSON.signal[i]; //j : i번째 JSON Data
                if(j.name == nameJSON[find_name]){
-                   var waveData = this_line.slice(0, -1);
-                   waveData = waveData.split(" ").join("");    //공백 제거
+                   var waveData = this_line.slice(0, -1);   //wave data
+                    waveData = waveData.split(" ").join("");    //공백 제거
                    WaveJSON.signal[i].wave += waveData;
        
-                //    array_[i] = 1;
-                array_[i] = waveData;
+                   array_[i] = 1;
+                    // array_[i] = waveData;
                }
            }
         }
