@@ -22,6 +22,8 @@ var wavedrom = {
             document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + this.waveJSON + "</script>";
             document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"a", wave :"1...."}]}</script>';
             console.log(document.body.innerHTML);
+
+            document.body.onload = "WaveDrom.ProcessAll()";
             
         });
     },
