@@ -6,20 +6,17 @@ var nameJSON = {};  // 모든 {char : id}이 든 JSON 형태
 data = fs.readFileSync('out.vcd', 'utf-8');
 lines = data.split('\n');   //각 줄이 배열로 들어가 있는 형태
 
-check = false;  //초기값 check
-check2 = false; //#number check
+check = false;  //#number check
 
-var this_num = -1, old_num = -1, num;
+var this_num, old_num = -1, num;
 var this_line;
 var wave_name;    //wave_name: WaveJSON의 data에 들어갈 데이터(wave가 b로 시작할 경우)
 var waveData;   // waveData: WaveJSON의 wave에 들어갈 데이터
 
-array_ = [];    //wave에 .을 추가하기 위해 변경되었는지 체크하는 배열 (변경되면 1, 아니면 0)
-                // #number에서 배열 array_를 읽고 '0'인 waveJSON의 wave에 '.'을 넣음
+array_ = [];    //wave에 .을 추가하기 위해 변경되었는지 체크하는 배열 (변경되면 waveData, 아니면 0)
 
 for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 읽음
     this_line = lines[line];    //한 줄 읽음
-    console.log('****',this_line);
 
     // 1. $var
     if(this_line.slice(0, 4) == '$var'){
@@ -28,39 +25,23 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
         var id = var_line[4];
         
         nameJSON[char] = id;
-        WaveJSON['signal'].push({"name" : id}); //WaveJSON에 var 저장
+        WaveJSON['signal'].push({"name" : id, "wave" : '', "data" : ''}); //WaveJSON에 var 저장
 
-    // 2. $dumpvars (초기값)
-    // }else if(this_line == '$dumpvars'){
-    //     console.log('초기값 설정');
-    //     check = true;
-
-    // }else if(check == true){
-    //     if(this_line == "$end"){    // $end가 나오기 전까지 계속 반복
-    //         console.log('초기값 끝');
-    //         check = false;
-    //     }else{
-    //         console.log('초기값 설정 else')
-    //         insertWaveJSONData();
-    //     }
-
-    // 3. #number
-    }else if(this_line.slice(0,1) == '#' && this_num == -1){ //#첫num 인 경우, (array_없음)
+    // 2. #number
+    }else if(this_line == "#0"){ //#초기값 설정 (array_가 없음)
+        console.log("초기값 설정")
         this_num = Number(this_line.slice(1));
+        num = this_num - old_num;
 
-        check2 = true;
-        console.log('첫 number!');
+        check = true;
 
-    }else if(check2 == true){
-        if(this_line.slice(0,1) == '#' || this_line == ''){    //처음이 아닌 #number인 경우, (this_line == '' 마지막인 경우)
-            old_num = this_num;
-            this_num = this_line == '' ? old_num + 1 : Number(this_line.slice(1));  //this_num = #"number"
-            num = this_num - old_num;
+    }else if(check == true){
+        if(this_line.slice(0,1) == '#' || this_line == ''){    //#0이 아닌 경우, (this_line == '' 마지막인 경우)
             
             console.log('this_num: ', this_num);
             console.log(array_)
-            // console.log('old_num : ', old_num);
-            // console.log('num: ', num);
+            console.log('old_num : ', old_num);
+            console.log('num: ', num);
             rpt = ".".repeat(num);
 
             for(k in array_){   //k = array_의 n번째
@@ -69,8 +50,7 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
                     console.log(rpt);
                     WaveJSON.signal[k].wave += rpt;
                 }else{
-                    rpt2 = ".".repeat(num - 1);
-                    rpt2 += n;
+                    rpt2 = ".".repeat(num - 1) + n;
                     console.log(rpt2);
                     WaveJSON.signal[k].wave += rpt2;
                 }
@@ -81,8 +61,13 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
                 array_[i] = 0;  // 값을 모두 0으로 채움
             }
 
+            // 값 변경
+            old_num = this_num;
+            this_num = this_line == '' ? old_num + 1 : Number(this_line.slice(1));  //this_num = #"number"
+            num = this_num - old_num;
+
         }else{  // wave값인 경우,
-            insertWaveJSONData();
+            this_line.slice(0,1) == '$' ? null : insertWaveJSONData();
         }
     }
 }
