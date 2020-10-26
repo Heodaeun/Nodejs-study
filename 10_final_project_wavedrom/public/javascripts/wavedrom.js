@@ -1,5 +1,3 @@
-console.log('hi');
-
 // var socket = io();
 // var waveJSON;
 
@@ -14,59 +12,30 @@ console.log('hi');
 //     socket.emit('click');
 // })
 
-var waveJSON = "{signal : []}";
+var waveJSON;
 
 var wavedrom = {
     socket: null,
 
     init: function(socket){
         socket = io();
+        console.log('hii');
+        console.log(waveJSON);
 
         // console.log('waveJSON: ', waveJSON);
-
-        document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + waveJSON + "</script>";
+        if(waveJSON != undefined){
+            document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + waveJSON + "</script>";
+        }
         document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"a", wave :"1...."}]}</script>';
         document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"b", wave :"1...."}]}</script>';
 
         // console.log(document.body.innerHTML);
 
-        socket.on('connect', function() {
-            console.log('connected');
-            socket.emit('initial');
-        });
+        // socket.on('connect', function() {
+        //     console.log('connected');
+        //     socket.emit('initial');
+        // });
 
-        socket.on('send_WaveDrom', function(WaveJSON){
-            console.log('send_waveDrom start');
-            console.log(WaveJSON);
-
-            this.waveJSON = WaveJSON;
-
-            // $('#page').text(WaveJSON.signal[0].wave);
-
-            // console.log("this.waveJSON : ", this.waveJSON);
-            // document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + this.waveJSON + "</script>";
-            // document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"b", wave :"1...."}]}</script>';
-            // // console.log(document.body.innerHTML);
-
-            // document.body.onload = "WaveDrom.ProcessAll()";
-
-            // $("body").load(window.location.href + "body");
-
-        //     $('script').each(function(){
-        //         if($(this).attr('src') == 'http://wavedrom.com/wavedrom.min.js' ){
-        //             var old_scr = $(this).attr('scr');
-        //             $(this).attr('scr', '');
-        //             setTimeout(function(){ $(this).attr('scr', old_scr + '?' + new Date()); }, 250);
-        //         }
-        //     })
-        // $("http://wavedrom.com/wavedrom.min.js").off();
-        $.getScript("javascripts/wavedrom.js")
-            .done(function(){
-            console.log('success to load js file');
-            }).fail(function(){
-                console.log('fail to load js file');
-            });
-        });
     },
 
     // waveJSON을 클릭했을 때
@@ -78,6 +47,48 @@ var wavedrom = {
 
     }
 };
+
+var socket = io();
+
+socket.on('send_WaveDrom', function(WaveJSON){
+    console.log('send_waveDrom start');
+    $("#page").text(WaveJSON.signal[0].wave);
+    waveJSON = WaveJSON;
+    wavedrom.init();
+});
+
+// socket.on('send_WaveDrom', function(WaveJSON){
+//     console.log('send_waveDrom start');
+//     console.log(WaveJSON);
+
+//     this.waveJSON = WaveJSON;
+
+//     // $('#page').text(WaveJSON.signal[0].wave);
+
+//     // console.log("this.waveJSON : ", this.waveJSON);
+//     // document.body.innerHTML = document.body.innerHTML + "<script type='WaveDrom'>" + this.waveJSON + "</script>";
+//     // document.body.innerHTML = document.body.innerHTML + '<script type="WaveDrom"> { signal : [{ name :"b", wave :"1...."}]}</script>';
+//     // // console.log(document.body.innerHTML);
+
+//     // document.body.onload = "WaveDrom.ProcessAll()";
+
+//     // $("body").load(window.location.href + "body");
+
+// //     $('script').each(function(){
+// //         if($(this).attr('src') == 'http://wavedrom.com/wavedrom.min.js' ){
+// //             var old_scr = $(this).attr('scr');
+// //             $(this).attr('scr', '');
+// //             setTimeout(function(){ $(this).attr('scr', old_scr + '?' + new Date()); }, 250);
+// //         }
+// //     })
+// // $("http://wavedrom.com/wavedrom.min.js").off();
+// $.getScript("javascripts/wavedrom.js")
+//     .done(function(){
+//     console.log('success to load js file');
+//     }).fail(function(){
+//         console.log('fail to load js file');
+//     });
+// });
 
 $(document).ready(function () {
     wavedrom.init();

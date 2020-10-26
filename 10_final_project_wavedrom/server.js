@@ -26,6 +26,8 @@ app.get('/', function(req, res){
 io.once('connection', (socket) => {
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
     console.log('WaveJSON: ', WaveJSON);
+    io.emit('send_WaveDrom', WaveJSON);
+    console.log('send wave');
     
     // input wavedrom data
     rl.on('line', function(line){
@@ -66,11 +68,11 @@ io.once('connection', (socket) => {
 
 
 
-    socket.on('initial', () => {
-        console.log('initial');
-        io.emit('send_WaveJSON', WaveJSON);
-        console.log('send');
-    })
+    // socket.on('initial', () => {
+    //     console.log('initial');
+    //     io.emit('send_WaveJSON', WaveJSON);
+    //     console.log('send');
+    // })
 
     // timing diagram click시
     socket.on('click', () => {
