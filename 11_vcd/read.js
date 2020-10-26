@@ -38,20 +38,20 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
     }else if(check == true){
         if(this_line.slice(0,1) == '#' || this_line == ''){    //#0이 아닌 경우, (this_line == '' 마지막인 경우)
             
-            console.log('this_num: ', this_num);
-            console.log(array_)
-            console.log('old_num : ', old_num);
-            console.log('num: ', num);
+            // console.log('this_num: ', this_num);
+            // console.log(array_)
+            // console.log('old_num : ', old_num);
+            // console.log('num: ', num);
             rpt = ".".repeat(num);
 
             for(k in array_){   //k = array_의 n번째
                 n = array_[k];  //n = array_의 k번째 data
                 if(typeof(n) == 'number'){  //n이 0인 경우(값에 변화가 없는 경우)
-                    console.log(rpt);
+                    // console.log(rpt);
                     WaveJSON.signal[k].wave += rpt;
                 }else{
                     rpt2 = ".".repeat(num - 1) + n;
-                    console.log(rpt2);
+                    // console.log(rpt2);
                     WaveJSON.signal[k].wave += rpt2;
                 }
             }
@@ -75,17 +75,15 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
 function insertWaveJSONData(){
     // b로 시작하는 경우
     if(this_line.slice(0,1) == 'b' || this_line.slice(0,1) == 'B'){
-
         binary = this_line.slice(1,-2);
         wave_name = parseInt(binary, 2).toString(16); // 2진수 -> 16진수
 
         insertWaveData(1);
-    }else{
-        //0 or 1 or .인 경우
+    //0 or 1 or .인 경우
+    }else{        
         insertWaveData(0);
     }
 }
-
 
 function insertWaveData(ck){
     find_name = this_line.slice(-1);
@@ -96,17 +94,15 @@ function insertWaveData(ck){
 
             waveData = ck == 0 ? this_line.slice(0,-1) : '2'; //waveData
             waveData = waveData.split(" ").join("");    //공백 제거
-
             array_[i] = waveData;
 
-            ck == 1 ? WaveJSON.signal[i].data += wave_name : null;
+            ck == 1 ? WaveJSON.signal[i].data += wave_name + ' ' : null;
 
             // console.log('waveData: ', waveData)
             // console.log('wave_name: ', wave_name)
         }
     }
 }
-
 
 // console.log(nameJSON);
 console.log(WaveJSON);

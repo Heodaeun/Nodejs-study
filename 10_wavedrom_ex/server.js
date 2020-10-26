@@ -5,8 +5,8 @@ const rl = readline.Interface({
     input: process.stdin,
     output: process.stdout
 });
-
 const app = express();
+
 var server = app.listen(4000, () => { //Start the server, listening on port 4000.
     console.log("Listening to requests on port 4000...");
 })
@@ -19,13 +19,13 @@ var dataBuffer = fs.readFileSync('WaveDrom.json');
 var dataJSON = dataBuffer.toString();
 var WaveJSON = JSON.parse(dataJSON);
 
+app.get('/', function(req, res){
+    res.send('root');
+})
 
 io.once('connection', (socket) => {
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
     console.log('WaveJSON: ', WaveJSON);
-    io.emit('send_WaveDrom', WaveJSON);
-
-    
     
     // input wavedrom data
     rl.on('line', function(line){
@@ -52,17 +52,31 @@ io.once('connection', (socket) => {
                     break;
                 }
             }
+
             // (3) 생성
             if(exist == false){ // json에 입력한 name이 없을 경우
                 WaveJSON['signal'].push({"name":input[0], "wave":input[1]});
             }
         }
-
         fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));    // 파일 저장
         console.log(WaveJSON);
 
         io.emit('send_WaveDrom', WaveJSON);
     });
+
+
+
+    socket.on('initial', () => {
+        console.log('initial');
+        io.emit('send_WaveJSON', WaveJSON);
+        console.log('send');
+    })
+
+    // timing diagram click시
+    socket.on('click', () => {
+
+    });
+
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
