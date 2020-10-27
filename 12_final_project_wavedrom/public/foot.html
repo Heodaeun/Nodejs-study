@@ -1,0 +1,29 @@
+            </script>
+        <input id="from" type="text">
+        <input id="to" type="text">
+        <button id="send" type="button">입력</button>           
+        
+        <script>
+            var socket = io();
+
+            $("#send").on('click', function(e){
+                from = document.getElementById("from").value;
+                to = document.getElementById("to").value;
+                console.log('from: ', from, ', to: ', to);
+
+                socket.emit('button', from, to);
+            });
+
+            socket.on('reload', () => {
+                // window.location.reload(true);
+            });
+
+        </script>
+    </body>
+    <style>
+        h1, h4 {
+            text-align: center;
+            font-family: 'Lato', sans-serif;
+        }
+    </style>
+</html>

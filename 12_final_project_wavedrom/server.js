@@ -1,3 +1,4 @@
+// import { WaveJSON } from './parsing.js';
 const express = require('express');
 const readline = require('readline');
 const fs = require('fs');
@@ -19,6 +20,13 @@ var dataBuffer = fs.readFileSync('WaveDrom.json');
 var dataJSON = dataBuffer.toString();
 var WaveJSON = JSON.parse(dataJSON);
 
+// read html file
+var head = fs.readFileSync('public/head.html', 'utf8');
+var foot = fs.readFileSync('public/foot.html', 'utf8');
+
+var html = head + JSON.stringify(WaveJSON) + foot;
+fs.writeFileSync('public/index.html', html);    //파일 저장
+
 app.get('/', function(req, res){
     res.send('root');
 })
@@ -28,6 +36,13 @@ io.once('connection', (socket) => {
     console.log('WaveJSON: ', WaveJSON);
     io.emit('send_WaveDrom', WaveJSON);
     console.log('send wave');
+
+    socket.on('first', () => {
+        console.log('init');
+        io.emit('send_WaveJSON', WaveJSON);
+        console.log('send');
+    });
+    
     
     // input wavedrom data
     rl.on('line', function(line){
@@ -63,20 +78,27 @@ io.once('connection', (socket) => {
         fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));    // 파일 저장
         console.log(WaveJSON);
 
+        // fs.writeFileSync('public/index2.html', JSON.stringify(html));    // 파일 저장
+
         io.emit('send_WaveDrom', WaveJSON);
     });
 
+    // slicing wave data
+    socket.on('button', (from, to) => {
+        console.log('button is pushed');
+        console.log('from: ', from, ', to: ', to);
 
+        for(i=0; i < WaveJSON.signal.length; i++){
+            console.log(WaveJSON.signal[i].wave);
+            wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
+            console.log('-> slicing: ', wave);
+            WaveJSON.signal[i].wave = wave;
+            console.log(WaveJSON);
+        }
+        
+        fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));
 
-    // socket.on('initial', () => {
-    //     console.log('initial');
-    //     io.emit('send_WaveJSON', WaveJSON);
-    //     console.log('send');
-    // })
-
-    // timing diagram click시
-    socket.on('click', () => {
-
+        io.emit('reload');
     });
 
 
