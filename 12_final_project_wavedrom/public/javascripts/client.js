@@ -33,34 +33,7 @@ var wavedrom = {
 
         // console.log(document.body.innerHTML);
     },
-
-    // waveJSON을 클릭했을 때
-    clicked: function(){
-        var socket = io();
-
-        console.log('clicked');
-        socket.emit('click');
-
-    }
 };
-
-var socket = io();
-
-
-// socket.on('connect', function() {
-//     console.log('connected');
-//     socket.emit('initial');
-// });
-
-
-socket.on('send_WaveDrom', function(WaveJSON){
-    console.log('send_waveDrom start');
-
-    $("#page").text(WaveJSON.signal[0].wave);
-    waveJSON = WaveJSON;
-    console.log(waveJSON);
-    // wavedrom.init();
-});
 
 $(document).ready(function () {
     wavedrom.init();

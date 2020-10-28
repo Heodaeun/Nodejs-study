@@ -2,10 +2,10 @@
         <input id="from" type="text">
         <input id="to" type="text">
         <button id="send" type="button">입력</button>           
-        
         <script>
             var socket = io();
 
+            // button clicked
             $("#send").on('click', function(e){
                 from = document.getElementById("from").value;
                 to = document.getElementById("to").value;
@@ -15,7 +15,7 @@
             });
 
             socket.on('reload', () => {
-                // window.location.reload(true);
+                window.location.reload();
             });
 
         </script>
