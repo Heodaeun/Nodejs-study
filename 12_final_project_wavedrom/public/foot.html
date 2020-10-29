@@ -1,7 +1,19 @@
             </script>
-        <input id="from" type="text">
-        <input id="to" type="text">
-        <button id="send" type="button">입력</button>           
+        <div class="container">
+            <div class="row form-group align-items-end">
+                <div id="long-space"></div>
+                <div class="col-md-2">
+                    <input id="from" type="text" class="form-control typeahead" placeholder="from" data-provide="typeahead" autcomplete="off">
+                </div>
+                <div class="col-md-2">
+                    <input id="to" type="text" class="form-control typeahead" placeholder="to" data-provide="typeahead" autcomplete="off">
+                </div>
+                <button id="send" type="button" class="btn btn-secondary">show</button>
+                <div id="space"></div>
+                <button id="reset" type="button" class="btn btn-danger">reset</button>
+            </div>
+        </div>
+
         <script>
             var socket = io();
 
@@ -9,15 +21,23 @@
             $("#send").on('click', function(e){
                 from = document.getElementById("from").value;
                 to = document.getElementById("to").value;
-                console.log('from: ', from, ', to: ', to);
+                console.log('reset button (from: ', from, ' , to: ', to, ')');
 
-                socket.emit('button', from, to);
+                socket.emit('send_button', from, to);
+                // window.location.reload();
+                location.href = location.href;
+
             });
+
+            $("#reset").on('click', function(e){
+                console.log('reset button');
+                socket.emit('reset_button');
+            })
 
             socket.on('reload', () => {
                 window.location.reload();
+                location.href = 'http://localhost:4000/';
             });
-
         </script>
     </body>
     <style>

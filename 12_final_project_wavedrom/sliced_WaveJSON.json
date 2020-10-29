@@ -1,0 +1,1 @@
+{"signal":[{"name":"i_PMOD1_P1","wave":"1..........0","data":""},{"name":"i_RESET_SYSB","wave":"01..........","data":""},{"name":"i_SCLK","wave":"101010101010","data":""},{"name":"o_LED","wave":"2...2.2.2.2.","data":"0 1 2 3 4 "},{"name":"LED_COUNT","wave":"2...2.2.2.2.","data":"0 1 2 3 4 "},{"name":"PULSE","wave":"0.1.........","data":""}],"foot":{"tock":1}}

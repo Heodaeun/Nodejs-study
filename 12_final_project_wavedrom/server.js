@@ -32,48 +32,57 @@ for (var line = 0; line < lines.length; line++){
 var WaveJSON = { signal : [], foot : { tock: 0 } };
 var nameJSON = {};  // 모든 {char : id}이 든 JSON 형태
 
-check = false;  //#number check
+var check = false;  //#number check
 var this_num, old_num = -1, num;
 var this_line;
 var wave_name;    //wave_name: WaveJSON의 data에 들어갈 데이터(wave가 b로 시작할 경우)
 var waveData;   // waveData: WaveJSON의 wave에 들어갈 데이터
 
-array_ = [];    //wave에 .을 추가하기 위해 변경되었는지 체크하는 배열 (변경되면 waveData, 아니면 0)
+var array_ = [];    //wave에 .을 추가하기 위해 변경되었는지 체크하는 배열 (변경되면 waveData, 아니면 0)
 
-for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 읽음
-    this_line = lines[line];    //한 줄 읽음
 
-    // 1. $var
-    if(this_line.slice(0, 4) == '$var'){
-        var var_line = this_line.split(' ');
-        var char = var_line[3];
-        var id = var_line[4];
-        
-        nameJSON[char] = id;
-        WaveJSON['signal'].push({"name" : id, "wave" : '', "data" : ''}); //WaveJSON에 var 저장
-
-    // 2. #number
-    }else if(this_line == "#0"){ //#초기값 설정 (array_가 없음)
-        this_num = Number(this_line.slice(1));
-        num = this_num - old_num;
-
-        check = true;
-
-    }else if(check == true){    //#0이 아닌 경우
-        //(1) #number < 500
-        if(TENto1 == false){
-            readNumber();
-
-        //(2) #number >= 500
-        }else{
-
+function Parsing_WaveJSON(){
+    for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 읽음
+        this_line = lines[line];    //한 줄 읽음
+    
+        // 1. $var
+        if(this_line.slice(0, 4) == '$var'){
+            var var_line = this_line.split(' ');
+            var char = var_line[3];
+            var id = var_line[4];
+            
+            nameJSON[char] = id;
+            WaveJSON['signal'].push({"name" : id, "wave" : '', "data" : ''}); //WaveJSON에 var 저장
+    
+        // 2. #number
+        }else if(this_line == "#0"){ //#초기값 설정 (array_가 없음)
+            this_num = Number(this_line.slice(1));
+            num = this_num - old_num;
+    
+            check = true;
+    
+        }else if(check == true){    //#0이 아닌 경우
+            //(1) #number < 500
+            if(TENto1 == false){
+                readNumber();
+    
+            //(2) #number >= 500
+            }else{
+                if(this_line.slice(0,1) == '#'){
+                    if(this_line.slice(-1) % 10 == 0){  //10의 배수라면 (10배수가 아니면 pass)
+                        
+                    }
+                }
+            }
         }
     }
+    fs.writeFileSync('WaveJSON.json', JSON.stringify(WaveJSON));    // 파일 저장
 }
+
 
 function readNumber(){
     if(this_line.slice(0,1) == '#' || this_line == ''){    //#number인 경우 (this_line == '' 마지막인 경우)
-        rpt = ".".repeat(num);
+        var rpt = ".".repeat(num);
 
         for(k in array_){   //k = array_의 n번째
             n = array_[k];  //n = array_의 k번째 data
@@ -99,6 +108,7 @@ function readNumber(){
         this_line.slice(0,1) == '$' ? null : insertWaveJSONData();
     }
 }
+
 
 function insertWaveJSONData(){
     // b로 시작하는 경우
@@ -128,7 +138,6 @@ function insertWaveData(ck){
         }
     }
 }
-fs.writeFileSync('WaveJSON.json', JSON.stringify(WaveJSON));    // 파일 저장
 
 
 function ChangeData(chk, tmp_wave, from, to){   //chk=0 : '.'아닌 경우, chk=1: ','인 경우
@@ -161,22 +170,23 @@ function ChangeData(chk, tmp_wave, from, to){   //chk=0 : '.'아닌 경우, chk=
     }
 }
 
+Parsing_WaveJSON();
 
 io.on('connection', (socket) => {
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
-    console.log('WaveJSON: ', WaveJSON);
+    // console.log('WaveJSON: ', WaveJSON);
 
 
     // read html file
     var head = fs.readFileSync('public/head.html', 'utf8');
     var foot = fs.readFileSync('public/foot.html', 'utf8');
+    var html;
 
-    var html = head + JSON.stringify(WaveJSON) + foot;
+    html = head + JSON.stringify(WaveJSON) + foot;
     fs.writeFileSync('public/index.html', html);    //파일 저장
 
-
     // slicing wave data
-    socket.on('button', (from, to) => {
+    socket.on('send_button', (from, to) => {
         from = parseInt(from), to = parseInt(to);
         console.log('button is pushed. (from: ', from, ', to: ', to, ')');
         // console.log('from: ', from, ', to: ', to);
@@ -189,43 +199,46 @@ io.on('connection', (socket) => {
 
             // (1) wave[from]이 '.''인 경우
             if(tmp_wave == '.'){
-                // tmp = from-1;
-                // console.log('tmp = from: ',tmp);
-                // console.log(WaveJSON.signal[i].name, ' wave is .');
-
                 while(tmp_wave == '.' && tmp > -1){
                     tmp_wave = WaveJSON.signal[i].wave[--tmp];
-
-                    // console.log('tmp: ',tmp);
-                    // console.log('tmp_wave: ',tmp_wave);
                 }
-
                 ChangeData(1, tmp_wave, from, to);
 
                 WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
                 WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.replace('.', tmp_wave);
-                console.log('slicing: ',WaveJSON.signal[i]);
+                console.log('slicing: ', WaveJSON.signal[i]);
 
             // (2) wave[from]이 '.'이 아닌 경우
             }else{
                 ChangeData(0, tmp_wave, from, to);
                 WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
             }
-            
         }
-
-
-        console.log(WaveJSON);
-        fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));
+        console.log('wavejson: ', WaveJSON);
+        fs.writeFileSync('sliced_WaveJSON.json', JSON.stringify(WaveJSON));
 
         html = head + JSON.stringify(WaveJSON) + foot;
-        fs.writeFileSync('public/index2.html', JSON.stringify(html));    // 파일 저장
+        fs.writeFileSync('public/index.html', html);    // 파일 저장
 
         io.emit('reload');
     });
 
 
+    socket.on('reset_button', () => {
+        fs.readFile('WaveJSON.json', 'utf8', function (err, data) {
+            if(err) throw err;
+            WaveJSON = JSON.parse(data);
+            
+            html = head + JSON.stringify(WaveJSON) + foot;
+            fs.writeFileSync('public/index.html', html);    //파일 저장
+
+            io.emit('reload');
+        });
+    });
+
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
-    })
+    });
 });
+
