@@ -22,9 +22,7 @@ var nameJSON = {};  // 모든 {char : id}이 든 JSON 형태
 data = fs.readFileSync('out.vcd', 'utf-8');
 lines = data.split('\n');   //각 줄이 배열로 들어가 있는 형태
 
-
 check = false;  //#number check
-
 var this_num, old_num = -1, num;
 var this_line;
 var wave_name;    //wave_name: WaveJSON의 data에 들어갈 데이터(wave가 b로 시작할 경우)
@@ -58,25 +56,13 @@ for (var line = 0; line < lines.length; line++) {   //한 줄씩 차례대로 �
             for(k in array_){   //k = array_의 n번째
                 n = array_[k];  //n = array_의 k번째 data
 
-                // old_wave = WaveJSON.signal[k].wave.slice(WaveJSON.signal[k].wave.length - 1);
-
                 if(typeof(n) == 'number'){  //n이 0인 경우(값에 변화가 없는 경우)
-                    // console.log(rpt);
                     WaveJSON.signal[k].wave += rpt;
-                    // WaveJSON.signal[k].wave += old_wave.repeat(num);
                 }else{
                     rpt2 = ".".repeat(num - 1) + n;
-                    // rpt2 = old_wave.repeat(num - 1) + n;
-                    // console.log(rpt2);
-                    // if(old_wave == '2'){
-                        // old_data = WaveJSON.signal[k].data.slice(WaveJSON.signal[k].data.length - 1);
-                        // rpt_data = old_data.repeat(num - 1) + n;
-                        // WaveJSON.signal[k].data += rpt_data + ' ';
-                    // }
                     WaveJSON.signal[k].wave += rpt2;
                 }
             }
-
             array_ = new Array(); // 모두 null [ <n empty items> ] (초기화)
             for(i=0; i<WaveJSON.signal.length; i++){
                 array_[i] = 0;  // 값을 모두 0으로 채움
@@ -127,68 +113,75 @@ fs.writeFileSync('WaveJSON.json', JSON.stringify(WaveJSON));    // 파일 저장
 io.on('connection', (socket) => {
 
     console.log("a user connected: ", socket.id); //show a log as a new client connects.
-    console.log('WaveJSON: ', WaveJSON);
+    // console.log('WaveJSON: ', WaveJSON);
 
-    
+
     // read html file
     var head = fs.readFileSync('public/head.html', 'utf8');
     var foot = fs.readFileSync('public/foot.html', 'utf8');
 
     var html = head + JSON.stringify(WaveJSON) + foot;
     fs.writeFileSync('public/index.html', html);    //파일 저장
-    
-
-    // input wavedrom data
-    // rl.on('line', function(line){
-    //     input = line.split(' ');
-    //     console.log('input: ', input);
-
-    //     var exist = false;  // json 속에 입력한 name이 있는지 없는지 확인하는 변수
-
-    //     // (1) 삭제
-    //     if(input[0] == 'delete'){ 
-    //         for(i in WaveJSON.signal){
-    //             if(WaveJSON.signal[i].name == input[1]){
-    //                 delete WaveJSON.signal[i];
-    //                 break;
-    //             }
-    //         }
-    //         WaveJSON.signal = WaveJSON.signal.filter(function(x) { return x != null }); // null 삭제
-    //     }else{
-    //         for(i in WaveJSON.signal){  // json속에 name이 있는지 확인
-    //         // (2) 추가
-    //             if(WaveJSON.signal[i].name == input[0]){ // name이 있을 경우
-    //                 WaveJSON.signal[i].wave += input[1]; //해당 name에 입력한 wave추가
-    //                 exist = true;
-    //                 break;
-    //             }
-    //         }
-
-    //         // (3) 생성
-    //         if(exist == false){ // json에 입력한 name이 없을 경우
-    //             WaveJSON['signal'].push({"name":input[0], "wave":input[1]});
-    //         }
-    //     }
-    //     fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));    // 파일 저장
-    //     console.log(WaveJSON);
-
-    //     html = head + JSON.stringify(WaveJSON) + foot;
-    //     fs.writeFileSync('public/index2.html', JSON.stringify(html));    // 파일 저장
-    // });
-
 
 
     // slicing wave data
     socket.on('button', (from, to) => {
-        console.log('button is pushed');
-        console.log('from: ', from, ', to: ', to);
+        from = parseInt(from), to = parseInt(to);
+        console.log('button is pushed. (from: ', from, ', to: ', to, ')');
+        // console.log('from: ', from, ', to: ', to);
 
-        for(i=0; i < WaveJSON.signal.length; i++){
-            console.log(WaveJSON.signal[i].wave);
-            wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
-            console.log('-> slicing: ', wave);
-            WaveJSON.signal[i].wave = wave;
+        for(i = 0; i < WaveJSON.signal.length; i++){ // wave[from]이 '.'인지 확인
+            tmp_wave = WaveJSON.signal[i].wave[from];
+            console.log('\n\ninit wave: ', WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1));
+
+            tmp = from;
+
+            // (1) wave[from]이 '.''인 경우
+            if(tmp_wave == '.'){
+                // tmp = from-1;
+                console.log('tmp = from: ',tmp);
+                console.log(WaveJSON.signal[i].name, ' wave is .');
+
+                while(tmp_wave == '.' && tmp > -1){
+                    tmp_wave = WaveJSON.signal[i].wave[--tmp];
+
+                    console.log('tmp: ',tmp);
+                    console.log('tmp_wave: ',tmp_wave);
+                }
+
+                WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
+                WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.replace('.', tmp_wave);
+                console.log('slicing: ',WaveJSON.signal[i]);
+
+            // (2) wave[from]이 '.'이 아닌 경우
+            }else{
+                WaveJSON.signal[i].wave = WaveJSON.signal[i].wave.slice(parseInt(from), parseInt(to)+1);
+            }
+            
+            // WaveJSON.signal[i].data 변경하는 코드
+            if(tmp_wave == '2'){
+                var order = 0;
+                var data = '';
+                for(l = 0; l < from; l++){
+                    if(WaveJSON.signal[i].wave[l] == '2'){
+                        order += 2;
+                    }
+                }
+                console.log('order: ', order);
+                console.log('order data: ', WaveJSON.signal[i].data[order]);
+                data += WaveJSON.signal[i].data[order] + ' ';
+
+                for(l = from; l <= to; l++){
+                    if(WaveJSON.signal[i].wave[l] == '2'){
+                        order += 2;
+                        data += WaveJSON.signal[i].data[order] + ' ';
+                    }
+                }
+                WaveJSON.signal[i].data = data; 
+            }
         }
+
+
         console.log(WaveJSON);
         fs.writeFileSync('WaveDrom.json', JSON.stringify(WaveJSON));
 
