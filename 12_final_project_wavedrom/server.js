@@ -15,12 +15,22 @@ var io = require('socket.io')(server); //Bind socket.io to our express server.
 app.use(express.static('public')); //Send index.html page on GET /
 
 
-// parsing json file
-var WaveJSON = { signal : [] };
-var nameJSON = {};  // 모든 {char : id}이 든 JSON 형태
-
+// read vcd file
 data = fs.readFileSync('out.vcd', 'utf-8');
 lines = data.split('\n');   //각 줄이 배열로 들어가 있는 형태
+
+
+// #number이 300을 넘기는지 확인
+var TENto1 = false;
+for (var line = 0; line < lines.length; line++){
+    if(this_line == '#300'){
+        
+    }
+}
+
+// parsing vcd filel to WaveJSON
+var WaveJSON = { signal : [], foot : { tock: 0 } };
+var nameJSON = {};  // 모든 {char : id}이 든 JSON 형태
 
 check = false;  //#number check
 var this_num, old_num = -1, num;
@@ -178,6 +188,7 @@ io.on('connection', (socket) => {
                     }
                 }
                 WaveJSON.signal[i].data = data; 
+                WaveJSON.foot.tock = from;
             }
         }
 
