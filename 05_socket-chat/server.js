@@ -20,7 +20,7 @@ io.on('connection', function(socket){
     var name = "익명" + count++;
     socket.name = name; //익명n
     io.to(socket.id).emit('create name', name); //'create name'이벤트를 발생시켜 클라이언트에게 전송
-    //io.to(socket.id).emit : 서버가 해당 socket id에만 이벤트를 전달함
+    // io.to(socket.id).emit : 서버가 해당 socket id에만 이벤트를 전달함
     io.emit('new_connect', name);   //io.emit : 사용자 전부에게 전달
 
     // (2) 채팅방 접속이 끊어졌을 때
