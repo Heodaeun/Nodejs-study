@@ -24,9 +24,6 @@
                 console.log('reset button (from: ', from, ' , to: ', to, ')');
 
                 socket.emit('send_button', from, to);
-                // window.location.reload();
-                location.href = location.href;
-
             });
 
             $("#reset").on('click', function(e){
@@ -40,10 +37,4 @@
             });
         </script>
     </body>
-    <style>
-        h1, h4 {
-            text-align: center;
-            font-family: 'Lato', sans-serif;
-        }
-    </style>
 </html>
