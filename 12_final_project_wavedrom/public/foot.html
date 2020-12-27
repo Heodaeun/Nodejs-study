@@ -21,13 +21,13 @@
             $("#send").on('click', function(e){
                 from = document.getElementById("from").value;
                 to = document.getElementById("to").value;
-                console.log('reset button (from: ', from, ' , to: ', to, ')');
+                console.log('pushed reset button (from: ', from, ' , to: ', to, ')');
 
                 socket.emit('send_button', from, to);
             });
 
             $("#reset").on('click', function(e){
-                console.log('reset button');
+                console.log('pushed reset button');
                 socket.emit('reset_button');
             })
 
